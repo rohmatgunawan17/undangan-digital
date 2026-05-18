@@ -5,72 +5,176 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Undangan - {{ $couple[0] }} & {{ $couple[1] }}</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;600&display=swap"
+        rel="stylesheet">
     <style>
+        :root {
+            --bg: #fbf8f6;
+            --card: #ffffff;
+            --muted: #7a6a62;
+            --text: #222222;
+            --accent: #b97b3a;
+            --radius: 14px;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
         body {
-            font-family: Inter, system-ui, sans-serif;
-            background: #fff;
-            color: #222;
+            font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
             margin: 0;
             padding: 0
         }
 
         .hero {
-            background: #f9f3ee;
-            padding: 36px;
+            background: linear-gradient(180deg, rgba(185, 123, 58, 0.06), transparent);
+            padding: 72px 24px 48px;
             text-align: center
         }
 
-        .hero img {
-            max-width: 240px;
-            border-radius: 12px
+        .hero .brand-img {
+            width: 160px;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 18px;
+            box-shadow: 0 18px 40px rgba(15, 12, 10, 0.08);
+            margin: 0 auto 18px
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.4rem;
+            margin: 8px 0 4px;
+            color: #2b2b2b;
+            letter-spacing: 0.01em
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-weight: 500;
+            margin: 0 0 6px
         }
 
         .container {
-            max-width: 920px;
-            margin: 18px auto;
-            padding: 18px
+            max-width: 980px;
+            margin: 28px auto;
+            padding: 0 18px
         }
 
         .section {
-            margin: 22px 0;
-            padding: 18px;
-            border-radius: 12px;
-            background: #fff;
-            border: 1px solid #eee
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 22px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(41, 31, 26, 0.05);
+            border: 1px solid rgba(180, 150, 120, 0.12)
         }
 
         .grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px
+        }
+
+        @media(max-width:820px) {
+            .grid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .event-item strong {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #2a1e1d
+        }
+
+        .event-item div {
+            color: var(--muted);
+            font-size: 0.95rem
+        }
+
+        .quote-ar {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.05rem;
+            color: #2b2b2b;
+            margin: 0 0 8px;
+            line-height: 1.45
+        }
+
+        .quote-translation {
+            color: var(--muted);
+            font-size: 0.95rem
         }
 
         .gallery img {
             width: 100%;
-            height: 160px;
+            height: 200px;
             object-fit: cover;
-            border-radius: 8px
+            border-radius: 10px;
+            display: block
+        }
+
+        ul {
+            padding-left: 18px;
+            margin: 0
+        }
+
+        li {
+            margin-bottom: 8px;
+            color: var(--muted)
         }
 
         .btn {
             display: inline-block;
-            padding: 10px 14px;
+            padding: 10px 16px;
             border-radius: 10px;
-            background: #d6433f;
+            background: var(--accent);
             color: #fff;
-            text-decoration: none
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(185, 123, 58, 0.12)
+        }
+
+        .btn.ghost {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid rgba(185, 123, 58, 0.12)
         }
 
         form .row {
             display: flex;
-            gap: 8px;
-            margin-bottom: 8px
+            gap: 10px;
+            margin-bottom: 10px
         }
 
-        @media(max-width:720px) {
-            .grid {
-                grid-template-columns: 1fr
-            }
+        input,
+        select,
+        textarea {
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #e6e1dd;
+            font-size: 0.95rem;
+            color: var(--text);
+            width: 100%
+        }
+
+        .rsvp-note {
+            padding: 12px;
+            border-radius: 10px;
+            background: #fbfffa;
+            border: 1px solid #d9f1df;
+            color: #23532a
+        }
+
+        .meta {
+            color: var(--muted);
+            font-size: 0.95rem
         }
     </style>
 </head>
