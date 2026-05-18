@@ -335,6 +335,73 @@
                 border-radius: 24px;
             }
         }
+
+        /* Modal & toast for preview/use actions */
+        #preview-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1200;
+        }
+
+        #preview-modal .modal-panel {
+            width: min(920px, 96%);
+            background: #fff;
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.28);
+            position: relative;
+            z-index: 1201;
+        }
+
+        #preview-modal .modal-title {
+            margin: 0 0 8px;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #2a1e1d;
+        }
+
+        #preview-modal .modal-body {
+            color: #5f4f4e;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            white-space: pre-wrap;
+        }
+
+        #preview-modal .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: transparent;
+            border: none;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        #preview-modal .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 1200;
+        }
+
+        #toast {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            bottom: 36px;
+            background: #2a2a2a;
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 12px;
+            opacity: 0;
+            transition: opacity 240ms ease, transform 240ms ease;
+            z-index: 1300;
+            pointer-events: none;
+        }
     </style>
 </head>
 
@@ -451,6 +518,134 @@
             </div>
         </section>
     </main>
+    <!-- Preview modal + toast -->
+    <div id="preview-modal" aria-hidden="true">
+        <div id="modal-overlay" class="modal-backdrop"></div>
+        <div class="modal-panel" role="dialog" aria-modal="true">
+            <button id="modal-close" class="modal-close" aria-label="Tutup">×</button>
+            <h3 class="modal-title"></h3>
+            <div class="modal-body"></div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
+                <button id="modal-copy-link" class="btn-sm use"
+                    style="border:none;background:#d6433f;color:#fff;padding:10px 14px;border-radius:8px">Salin
+                    Link</button>
+                <button id="modal-close-2" class="btn-sm preview"
+                    style="border:1px solid #d6433f;background:#fff;color:#d6433f;padding:10px 14px;border-radius:8px">Tutup</button>
+            </div>
+        </div>
+    </div>
+    <div id="toast" role="status" aria-live="polite"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var modal = document.getElementById('preview-modal');
+            var modalTitle = modal.querySelector('.modal-title');
+            var modalBody = modal.querySelector('.modal-body');
+            var overlay = document.getElementById('modal-overlay');
+            var closeBtn = document.getElementById('modal-close');
+            var closeBtn2 = document.getElementById('modal-close-2');
+            var copyBtn = document.getElementById('modal-copy-link');
+            var toast = document.getElementById('toast');
+
+            function showModal(title, body, themeSlug) {
+                modalTitle.textContent = title;
+                modalBody.textContent = body;
+                modal.dataset.theme = themeSlug || '';
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+
+            function hideModal() {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+
+            function showToast(msg) {
+                toast.textContent = msg;
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateX(-50%) translateY(0)';
+                setTimeout(function() {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateX(-50%) translateY(20px)';
+                }, 3500);
+            }
+
+            document.querySelectorAll('.btn-sm.preview').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var card = btn.closest('.card');
+                    var title = (card && card.querySelector('.card-title')) ? card.querySelector(
+                        '.card-title').innerText : 'Preview';
+                    var price = (card && card.querySelector('.card-price')) ? card.querySelector(
+                        '.card-price').innerText : '';
+                    var body = price + '\n\nContoh preview tema "' + title +
+                        '".\nKlik "Salin Link" untuk menggunakan tema ini.';
+                    var slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g,
+                        '');
+                    showModal(title, body, slug);
+                });
+            });
+
+            document.querySelectorAll('.btn-sm.use').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var card = btn.closest('.card');
+                    var title = (card && card.querySelector('.card-title')) ? card.querySelector(
+                        '.card-title').innerText : 'tema';
+                    var slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g,
+                        '');
+                    var url = window.location.origin + '/create?theme=' + encodeURIComponent(slug);
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(url).then(function() {
+                            showToast('Link tema disalin: ' + url);
+                        }).catch(function() {
+                            alert('Gagal menyalin: ' + url);
+                        });
+                    } else {
+                        var ta = document.createElement('textarea');
+                        ta.value = url;
+                        document.body.appendChild(ta);
+                        ta.select();
+                        try {
+                            document.execCommand('copy');
+                            showToast('Link tema disalin: ' + url);
+                        } catch (err) {
+                            alert('Salin gagal: ' + url);
+                        }
+                        ta.remove();
+                    }
+                });
+            });
+
+            overlay.addEventListener('click', hideModal);
+            closeBtn.addEventListener('click', hideModal);
+            if (closeBtn2) closeBtn2.addEventListener('click', hideModal);
+
+            copyBtn.addEventListener('click', function() {
+                var slug = modal.dataset.theme || '';
+                var url = window.location.origin + '/create?theme=' + encodeURIComponent(slug);
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(url).then(function() {
+                        showToast('Link tema disalin: ' + url);
+                    }).catch(function() {
+                        alert('Gagal menyalin: ' + url);
+                    });
+                } else {
+                    var ta = document.createElement('textarea');
+                    ta.value = url;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    try {
+                        document.execCommand('copy');
+                        showToast('Link tema disalin: ' + url);
+                    } catch (err) {
+                        alert('Salin gagal: ' + url);
+                    }
+                    ta.remove();
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
