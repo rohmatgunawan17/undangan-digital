@@ -11,7 +11,20 @@ class ThemeController extends Controller
      */
     public function create(Request $request)
     {
-        $theme = $request->query('theme', 'default');
-        return view('create', ['theme' => $theme]);
+        $allowed = [
+            'elegan-grey',
+            'black-java',
+            'elegan-gold',
+        ];
+
+        $theme = $request->query('theme', 'elegan-grey');
+        $theme = strtolower(trim($theme));
+        $theme = str_replace([' ', '_'], '-', $theme);
+
+        if (!in_array($theme, $allowed, true)) {
+            $theme = 'elegan-grey';
+        }
+
+        return view('create', ['theme' => $theme, 'allowed' => $allowed]);
     }
 }
